@@ -4,11 +4,11 @@ import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 
 const input = document.querySelector('#datetime-picker');
-const btn = document.querySelector('[data-start]');
-const days = document.querySelector('[data-days]');
-const hours = document.querySelector('[data-hours]');
-const minutes = document.querySelector('[data-minutes');
-const seconds = document.querySelector('[data-seconds]');
+const startBtn = document.querySelector('button[data-start]');
+const daysEl = document.querySelector('[data-days]');
+const hoursEl = document.querySelector('[data-hours]');
+const minutesEl = document.querySelector('[data-minutes');
+const secondsEl = document.querySelector('[data-seconds]');
 
 let userSelectedDate = null;
 
@@ -26,14 +26,44 @@ const options = {
         message: '"Please choose a date in the future"',
         position: 'topRight',
       });
-      btn.disabled = true;
+      startBtn.disabled = true;
     } else {
-      btn.disabled = false;
+      startBtn.disabled = false;
     }
   },
 };
 
 flatpickr(input, options);
+
+function addLeadingZero(value) {
+  return String(value).padStart(2, '0');
+}
+
+function updateTimerInterface({ days, hours, minutes, seconds }) {
+  daysEl.textContent = addLeadingZero(days);
+  hoursEl.textContent = addLeadingZero(hours);
+  minutesEl.textContent = addLeadingZero(minutes);
+  secondsEl.textContent = addLeadingZero(seconds);
+}
+
+startBtn.addEventListener('click', () => {
+  startBtn.disabled = true;
+  input.disabled = true;
+
+  timerId = setInterval(() => {
+    const msLeft = userSelectedDate - new Date();
+
+    if (msLeft <= 0) {
+      clearInterval(timerId);
+      updateTimerInterface({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      input.disabled = false;
+      return;
+    }
+
+    const timeData = convertMs(msLeft);
+    updateTimerInterface(timeData);
+  }, 1000);
+});
 
 function convertMs(ms) {
   // Number of milliseconds per unit of time
