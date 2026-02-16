@@ -49,6 +49,7 @@ function updateTimerInterface({ days, hours, minutes, seconds }) {
 startBtn.addEventListener('click', () => {
   startBtn.disabled = true;
   input.disabled = true;
+  let timerId = null;
 
   timerId = setInterval(() => {
     const msLeft = userSelectedDate - new Date();
